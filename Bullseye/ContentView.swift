@@ -10,50 +10,103 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State var alertIsVisible: Bool = false
-    @State var whosThereIsVisible: Bool = false
+    @State var checkValueIsVisible: Bool = false
+    @State var startOverIsVisible: Bool = false
+    @State var infoIsVisible: Bool = false
+    @State var sliderValue: Double = 50.0
     
     
     var body: some View {
 
         VStack {
-            Text("Welcome to my first app")
-                .fontWeight(.semibold)
-                .foregroundColor(Color.green)
-
-            Button(action: {
-                print("Button pressed")
-                self.alertIsVisible = true
-            }) {
-                Text(/*@START_MENU_TOKEN@*/"Hit Me!"/*@END_MENU_TOKEN@*/)
-                    .fontWeight(.semibold)
+            //Target row
+            Spacer()
+            HStack {
+                Text("Put the bullseye as close as you can to:")
+                Text("100")
+                    
             }
 
-            .alert(isPresented: $alertIsVisible) { () ->
-                 Alert in
-                 return Alert(title: Text("Hello there!"),
-                              message: Text("This is my first pop-up."),
-                              dismissButton: .default(Text("Dismiss")))
+            //Slider row
+            Spacer()
+            HStack {
+                Text("1")
+                Slider(value: self.$sliderValue, in: 1...100)
+                .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
+                 Text("100")
              }
+            .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
+            
+            
+            //Button row
+            Spacer()
+            HStack {
+                //start over button
+                  Button(action: {
+                      self.checkValueIsVisible = true
+                  }) {
+                      Text("Check Value")
+                          .fontWeight(.semibold)
+                  }
+                  .alert(isPresented: $checkValueIsVisible) { () ->
+                    Alert in
+                    var roundedValue: Int = Int(self.sliderValue.rounded())
+                        return Alert(title: Text("Current Value"),
+                                    message: Text("Value is \(roundedValue)"),
+                                    dismissButton: .default(Text("Dismiss")))
+                   }
 
-            Button(action: {
-                self.whosThereIsVisible = true
-            }) {
-                Text("Knock Knock")
             }
-
-            .alert(isPresented: $whosThereIsVisible) { () ->
-                Alert in
-                return Alert(title: Text("Who's There?"),
-                             message: Text("Orange"),
-                             dismissButton: .default(Text("Orange who?")))
+            
+            
+            //Score row
+            Spacer()
+            HStack {
+                //start over button
+                Button(action: {
+                    self.startOverIsVisible = true
+                }) {
+                    Text("Start over")
+                        .fontWeight(.semibold)
+                }
+                .alert(isPresented: $startOverIsVisible) { () ->
+                     Alert in
+                     return Alert(title: Text("Start Over"),
+                                  message: Text("Starting Over"),
+                                  dismissButton: .default(Text("Dismiss")))
+                 }
+                //Score
+                Spacer()
+                Text("Score:")
+                Text("999999")
+                //Score
+                Spacer()
+                Text("Round:")
+                Text("999")
+                
+                //Info
+                Spacer()
+                Button(action: {
+                    self.infoIsVisible = true
+                }) {
+                    Text("Info")
+                        .fontWeight(.semibold)
+                }
+                .alert(isPresented: $infoIsVisible) { () ->
+                     Alert in
+                     return Alert(title: Text("Info"),
+                                  message: Text("Info"),
+                                  dismissButton: .default(Text("Dismiss")))
+                 }
             }
+            .padding(.init(top: 0, leading: 30, bottom: 20, trailing: 30))
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        //Landscape iPhone 8
+        ContentView().previewLayout(.fixed(width: 667, height: 375))
     }
 }
