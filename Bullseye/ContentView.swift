@@ -10,31 +10,31 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State var checkValueIsVisible: Bool = false
-    @State var startOverIsVisible: Bool = false
-    @State var infoIsVisible: Bool = false
-    @State var sliderValue: Double = 50.0
-    @State var target: Int = Int.random(in: 1...100)
+    @State var checkValueIsVisible = false
+    @State var startOverIsVisible = false
+    @State var infoIsVisible = false
+    @State var sliderValue = 50.0
+    @State var target = Int.random(in: 1...100)
     
     
     var body: some View {
-
+        
         VStack {
             //Target row
             Spacer()
             HStack {
                 Text("Put the bullseye as close as you can to:")
-                Text(String(self.target))
+                Text(String(target))
             }
-
+            
             //Slider row
             Spacer()
             HStack {
                 Text("1")
                 Slider(value: self.$sliderValue, in: 1...100)
-                .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
-                 Text("100")
-             }
+                    .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
+                Text("100")
+            }
             .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
             
             
@@ -42,20 +42,19 @@ struct ContentView: View {
             Spacer()
             HStack {
                 //start over button
-                  Button(action: {
-                      self.checkValueIsVisible = true
-                  }) {
-                      Text("Check Value")
-                          .fontWeight(.semibold)
-                  }
-                  .alert(isPresented: $checkValueIsVisible) { () ->
+                Button(action: {
+                    self.checkValueIsVisible = true
+                }) {
+                    Text("Check Value")
+                        .fontWeight(.semibold)
+                }
+                .alert(isPresented: $checkValueIsVisible) { () ->
                     Alert in
-                    var roundedValue: Int = Int(self.sliderValue.rounded())
-                        return Alert(title: Text("Current Value"),
-                                     message: Text("Value is \(roundedValue)\n" +
-                                        "You scored  \(pointsForCurrentRound())\n"),
-                                    dismissButton: .default(Text("Dismiss")))
-                   }
+                    return Alert(title: Text("Current Value"),
+                                 message: Text("Value is \(sliderValueRounded())\n" +
+                                    "You scored  \(pointsForCurrentRound())\n"),
+                                 dismissButton: .default(Text("Dismiss")))
+                }
             }
             
             //Score row
@@ -69,11 +68,11 @@ struct ContentView: View {
                         .fontWeight(.semibold)
                 }
                 .alert(isPresented: $startOverIsVisible) { () ->
-                     Alert in
-                     return Alert(title: Text("Start Over"),
-                                  message: Text("Starting Over"),
-                                  dismissButton: .default(Text("Dismiss")))
-                 }
+                    Alert in
+                    return Alert(title: Text("Start Over"),
+                                 message: Text("Starting Over"),
+                                 dismissButton: .default(Text("Dismiss")))
+                }
                 //Score
                 Spacer()
                 Text("Score:")
@@ -92,11 +91,11 @@ struct ContentView: View {
                         .fontWeight(.semibold)
                 }
                 .alert(isPresented: $infoIsVisible) { () ->
-                     Alert in
-                     return Alert(title: Text("Info"),
-                                  message: Text("Info"),
-                                  dismissButton: .default(Text("Dismiss")))
-                 }
+                    Alert in
+                    return Alert(title: Text("Info"),
+                                 message: Text("Info"),
+                                 dismissButton: .default(Text("Dismiss")))
+                }
             }
             .padding(.init(top: 0, leading: 30, bottom: 20, trailing: 30))
         }
@@ -106,19 +105,26 @@ struct ContentView: View {
     func pointsForCurrentRound() -> Int {
         var awardedPoints: Int
         var difference: Int
-        var roundedValue: Int = Int(self.sliderValue.rounded())
-       if roundedValue > self.target {
-           difference = roundedValue - self.target
-       } else if self.target > roundedValue {
-           difference = self.target - roundedValue
-       } else  {
-           difference = 0
-       }// must be equal
+        var roundedValue: Int
+        
+        roundedValue = sliderValueRounded()
+        
+        difference = abs(roundedValue - self.target)
         
         awardedPoints = 100 - difference
         return awardedPoints
-     }
-
+    }
+    
+    func pointsForCurrentRound2() -> Int {
+        
+        return 100 - (abs(sliderValueRounded() - target))
+    }
+    
+    func sliderValueRounded() -> Int {
+        return Int(sliderValue.rounded())
+    }
+    
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
