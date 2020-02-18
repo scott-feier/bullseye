@@ -14,6 +14,7 @@ struct ContentView: View {
     @State var startOverIsVisible: Bool = false
     @State var infoIsVisible: Bool = false
     @State var sliderValue: Double = 50.0
+    @State var target: Int = Int.random(in: 1...100)
     
     
     var body: some View {
@@ -23,8 +24,7 @@ struct ContentView: View {
             Spacer()
             HStack {
                 Text("Put the bullseye as close as you can to:")
-                Text("100")
-                    
+                Text(String(self.target))
             }
 
             //Slider row
@@ -52,12 +52,11 @@ struct ContentView: View {
                     Alert in
                     var roundedValue: Int = Int(self.sliderValue.rounded())
                         return Alert(title: Text("Current Value"),
-                                    message: Text("Value is \(roundedValue)"),
+                                     message: Text("Value is \(roundedValue)\n" +
+                                        "You scored  \(pointsForCurrentRound())\n"),
                                     dismissButton: .default(Text("Dismiss")))
                    }
-
             }
-            
             
             //Score row
             Spacer()
@@ -102,6 +101,24 @@ struct ContentView: View {
             .padding(.init(top: 0, leading: 30, bottom: 20, trailing: 30))
         }
     }
+    
+    
+    func pointsForCurrentRound() -> Int {
+        var awardedPoints: Int
+        var difference: Int
+        var roundedValue: Int = Int(self.sliderValue.rounded())
+       if roundedValue > self.target {
+           difference = roundedValue - self.target
+       } else if self.target > roundedValue {
+           difference = self.target - roundedValue
+       } else  {
+           difference = 0
+       }// must be equal
+        
+        awardedPoints = 100 - difference
+        return awardedPoints
+     }
+
 }
 
 struct ContentView_Previews: PreviewProvider {
