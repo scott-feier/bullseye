@@ -11,10 +11,11 @@ import SwiftUI
 struct ContentView: View {
     
     @State var checkValueIsVisible = false
-    @State var startOverIsVisible = false
     @State var infoIsVisible = false
     @State var sliderValue = 50.0
     @State var target = Int.random(in: 1...100)
+    @State var score = 0
+    @State var round = 0
     
     
     var body: some View {
@@ -43,18 +44,26 @@ struct ContentView: View {
             HStack {
                 //start over button
                 Button(action: {
+                    //actions before alert is shown
                     self.checkValueIsVisible = true
                 }) {
                     Text("Check Value")
                         .fontWeight(.semibold)
                 }
+                    
                 .alert(isPresented: $checkValueIsVisible) { () ->
                     Alert in
-                    return Alert(title: Text("Current Value"),
+                    return Alert(title: Text(alertTitle()),
                                  message: Text("Value is \(sliderValueRounded())\n" +
                                     "You scored  \(pointsForCurrentRound())\n"),
-                                 dismissButton: .default(Text("Dismiss")))
+                                 dismissButton: .default(Text("Dismiss")){
+                                    //actions when dismiss is clicked
+                                    self.score = self.score + self.pointsForCurrentRound()
+                                    self.round = self.round + 1
+                                    self.target = Int.random(in: 1...100)
+                        })
                 }
+                
             }
             
             //Score row
@@ -62,25 +71,20 @@ struct ContentView: View {
             HStack {
                 //start over button
                 Button(action: {
-                    self.startOverIsVisible = true
+                    self.resetGame()
                 }) {
                     Text("Start over")
                         .fontWeight(.semibold)
                 }
-                .alert(isPresented: $startOverIsVisible) { () ->
-                    Alert in
-                    return Alert(title: Text("Start Over"),
-                                 message: Text("Starting Over"),
-                                 dismissButton: .default(Text("Dismiss")))
-                }
+
                 //Score
                 Spacer()
                 Text("Score:")
-                Text("999999")
+                Text("\(score)")
                 //Score
                 Spacer()
                 Text("Round:")
-                Text("999")
+                Text("\(round)")
                 
                 //Info
                 Spacer()
@@ -102,7 +106,55 @@ struct ContentView: View {
     }
     
     
+
+    func resetGame() {
+        round = 0
+        score = 0
+        target = Int.random(in: 1...100)
+        sliderValue = 50.0
+    }
+    
+    
     func pointsForCurrentRound() -> Int {
+        let maximumScore = 100
+        let difference = amountOff()
+        let bonus: Int
+        
+        if difference == 0 {
+             bonus = 100
+         } else if difference == 1 {
+             bonus = 50
+         } else {
+             bonus = 0
+         }
+         
+         return maximumScore - difference + bonus
+     }
+     
+    func amountOff() -> Int {
+        return abs(sliderValueRounded() - target)
+    }
+    
+ 
+    func sliderValueRounded() -> Int {
+        return Int(sliderValue.rounded())
+    }
+    
+    func alertTitle() -> String {
+        let difference = amountOff()
+        let title: String
+        
+        if difference == 0 {
+            title = "Perfect"
+        } else if difference < 20 {
+            title = "Close"
+        } else {
+            title = "Too far"
+        }
+        return title
+    }
+    
+    func pointsForCurrentRound2() -> Int {
         var awardedPoints: Int
         var difference: Int
         var roundedValue: Int
@@ -114,17 +166,6 @@ struct ContentView: View {
         awardedPoints = 100 - difference
         return awardedPoints
     }
-    
-    func pointsForCurrentRound2() -> Int {
-        
-        return 100 - (abs(sliderValueRounded() - target))
-    }
-    
-    func sliderValueRounded() -> Int {
-        return Int(sliderValue.rounded())
-    }
-    
-    
 }
 
 struct ContentView_Previews: PreviewProvider {
