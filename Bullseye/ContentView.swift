@@ -11,12 +11,52 @@ import SwiftUI
 struct ContentView: View {
     
     @State var checkValueIsVisible = false
-    @State var infoIsVisible = false
     @State var sliderValue = 50.0
     @State var target = Int.random(in: 1...100)
     @State var score = 0
     @State var round = 0
+    let midnightBlue = Color(red: 0.0 / 255.0, green: 51.0 / 255.0, blue: 102.0 / 255.0)
     
+    struct LabelStyle: ViewModifier {
+        func body(content: Content) -> some View {
+            return content
+                .modifier(Shadow())
+                .foregroundColor(Color.white)
+                .font(Font.custom("Arial Rounded MT Bold", size:18))
+        }
+    }
+    
+    struct ValueStyle: ViewModifier {
+        func body(content: Content) -> some View {
+            return content
+                .modifier(Shadow())
+                .foregroundColor(Color.yellow)
+                .font(Font.custom("Arial Rounded MT Bold", size:24))
+        }
+    }
+    
+    struct Shadow: ViewModifier {
+        func body(content: Content) -> some View {
+            return content
+                .shadow(color: Color.black, radius: 5, x: 2, y: 2)
+        }
+    }
+    
+    struct ButtonLargeTextStyle: ViewModifier {
+        func body(content: Content) -> some View {
+            return content
+                .foregroundColor(Color.black)
+                .font(Font.custom("Arial Rounded MT Bold", size:18))
+        }
+    }
+    
+    struct ButtonSmallTextStyle: ViewModifier {
+        func body(content: Content) -> some View {
+            return content
+                .foregroundColor(Color.black)
+                .font(Font.custom("Arial Rounded MT Bold", size:12))
+        }
+    }
     
     var body: some View {
         
@@ -24,17 +64,22 @@ struct ContentView: View {
             //Target row
             Spacer()
             HStack {
-                Text("Put the bullseye as close as you can to:")
-                Text(String(target))
+                Text("Put the bullseye as close as you can to:").modifier(LabelStyle())
+                
+                Text(String(target)).modifier(ValueStyle())
+                
             }
             
             //Slider row
             Spacer()
             HStack {
-                Text("1")
+                Text("1").modifier(ValueStyle())
+                
                 Slider(value: self.$sliderValue, in: 1...100)
                     .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
-                Text("100")
+                    .accentColor(Color.green)
+                Text("100").modifier(ValueStyle())
+                
             }
             .padding(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
             
@@ -47,9 +92,10 @@ struct ContentView: View {
                     //actions before alert is shown
                     self.checkValueIsVisible = true
                 }) {
-                    Text("Check Value")
-                        .fontWeight(.semibold)
+                    
+                    Text("Value").modifier(ButtonLargeTextStyle())
                 }
+                .background(Image("Button")).modifier(Shadow())
                     
                 .alert(isPresented: $checkValueIsVisible) { () ->
                     Alert in
@@ -73,40 +119,50 @@ struct ContentView: View {
                 Button(action: {
                     self.resetGame()
                 }) {
-                    Text("Start over")
-                        .fontWeight(.semibold)
+                    HStack {
+                        Image("StartOverIcon")
+                        Text("Start over").modifier(ButtonSmallTextStyle())
+                    }
+                    
+                    
                 }
-
+                .background(Image("Button")).modifier(Shadow())
+                
                 //Score
                 Spacer()
-                Text("Score:")
-                Text("\(score)")
+                Text("Score:").modifier(LabelStyle())
+                
+                
+                Text("\(score)").modifier(ValueStyle())
+                
                 //Score
                 Spacer()
-                Text("Round:")
-                Text("\(round)")
+                Text("Round:").modifier(LabelStyle())
+                
+                Text("\(round)").modifier(ValueStyle())
+                
                 
                 //Info
                 Spacer()
-                Button(action: {
-                    self.infoIsVisible = true
-                }) {
-                    Text("Info")
-                        .fontWeight(.semibold)
+                NavigationLink(destination: AboutView()) {
+                    HStack {
+                        Image("InfoIcon")
+                        Text("Info").modifier(ButtonSmallTextStyle())
+                    }
                 }
-                .alert(isPresented: $infoIsVisible) { () ->
-                    Alert in
-                    return Alert(title: Text("Info"),
-                                 message: Text("Info"),
-                                 dismissButton: .default(Text("Dismiss")))
-                }
+                .background(Image("Button")).modifier(Shadow())
+                .padding(.init(top: 0, leading: 0, bottom: 0, trailing: 20))
+
             }
             .padding(.init(top: 0, leading: 30, bottom: 20, trailing: 30))
         }
+        .background(Image("Background"), alignment: .center)
+        .accentColor(midnightBlue)
+    .navigationBarTitle("Bullseye")
     }
     
     
-
+    
     func resetGame() {
         round = 0
         score = 0
@@ -121,21 +177,21 @@ struct ContentView: View {
         let bonus: Int
         
         if difference == 0 {
-             bonus = 100
-         } else if difference == 1 {
-             bonus = 50
-         } else {
-             bonus = 0
-         }
-         
-         return maximumScore - difference + bonus
-     }
-     
+            bonus = 100
+        } else if difference == 1 {
+            bonus = 50
+        } else {
+            bonus = 0
+        }
+        
+        return maximumScore - difference + bonus
+    }
+    
     func amountOff() -> Int {
         return abs(sliderValueRounded() - target)
     }
     
- 
+    
     func sliderValueRounded() -> Int {
         return Int(sliderValue.rounded())
     }
